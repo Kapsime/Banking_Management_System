@@ -1,0 +1,15 @@
+CREATE TABLE branch_master(
+branch_id VARCHAR(6),
+branch_name VARCHAR(30),
+branch_city VARCHAR(30),
+CONSTRAINT branch_bid_pk PRIMARY KEY (branch_id));
+
+insert into branch_master values('B00001', 'ASAF ALI ROAD','DELHI');
+insert into branch_master values('B00002','NEW DELHI MAIN BRANCH','DELHI');
+insert into branch_master values('B00003' ,'DELHI CANTT', 'DELHI');
+insert into branch_master values('B00004' ,'JASOLA', 'DELHI');
+insert into branch_master values('B00005' ,'MAHIM' ,'MUMBAI');
+insert into branch_master values('B00006' ,'VILE PARLE', 'MUMBAI');
+insert into branch_master values('B00007', 'MANDVI' ,'MUMBAI');
+insert into branch_master values('B00008' ,'JADAVPUR', 'KOLKATA');
+insert into branch_master values('B00009' ,'KODAMBAKKAM', 'CHENNAI'
