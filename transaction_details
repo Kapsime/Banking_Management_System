@@ -1,0 +1,23 @@
+CREATE TABLE transaction_details(
+transaction_number VARCHAR(6),
+account_number VARCHAR(6),
+date_of_transaction DATE,
+medium_of_transaction VARCHAR(20),
+transaction_type VARCHAR(20),
+transaction_amount INT(7),
+CONSTRAINT transaction_details_tnumber_pk PRIMARY KEY (transaction_number),
+CONSTRAINT transaction_details_acnumber_fk FOREIGN KEY (account_number)
+REFERENCES account_master (account_number));
+
+insert into transaction_details values('T00001', 'A00001', '2013-01-01', 'CHEQUE', 'DEPOSIT', 2000);
+insert into transaction_details values('T00002' ,'A00001' ,'2013-02-01' ,'CASH' ,'WITHDRAWAL', 1000);
+insert into transaction_details values('T00003', 'A00002 ', '2013-01-01', 'CASH' ,'DEPOSIT', 2000);
+insert into transaction_details values('T00004', 'A00002', '2013-02-01' , 'CASH' ,'DEPOSIT', 3000);
+insert into transaction_details values('T00005', 'A00007', '2013-01-11', 'CASH' ,'DEPOSIT', 7000);
+insert into transaction_details values('T00006', 'A00007', '2013-01-13', 'CASH' ,'DEPOSIT', 9000);
+insert into transaction_details values('T00007', 'A00001', '2013-03-13', 'CASH' ,'DEPOSIT' ,4000);
+insert into transaction_details values('T00008', 'A00001', '2013-03-14', 'CHEQUE','DEPOSIT' ,3000);
+insert into transaction_details values('T00009', 'A00001', '2013-03-21', 'CASH','WITHDRAWAL' ,9000);
+insert into transaction_details values('T00010', 'A00001', '2013-03-22', 'CASH','WITHDRAWAL' ,2000);
+insert into transaction_details values('T00011', 'A00002', '2013-03-25', 'CASH','WITHDRAWAL' ,7000);
+insert into transaction_details values('T00012', 'A00007', '2013-03-26', 'CASH','WITHDRAWAL' ,2000);
