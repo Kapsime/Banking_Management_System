@@ -1,0 +1,12 @@
+CREATE TABLE loan_details
+(customer_number varchar(255),
+branch_id varchar(255),
+loan_amount bigint(20),
+foreign key(customer_number) references customer_master(customer_number));
+
+insert into Loan_details values('C00001', 'B00001', 100000);
+insert into Loan_details values('C00002', 'B00002', 200000);
+insert into Loan_details values('C00009', 'B00008', 400000);
+insert into Loan_details values('C00010', 'B00009', 500000);
+insert into Loan_details values('C00001', 'B00003', 600000);
+insert into Loan_details values('C00002', 'B00001', 600000);
