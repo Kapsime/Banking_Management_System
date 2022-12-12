@@ -1,0 +1,175 @@
+1. Query to display account number, customer’s number, customer’s firstname,lastname, account opening date. Records sorted in ascending order based on
+account number.
+SELECT a.account_number,c.customer_number,c.firstname,c.lastname,a.account_number
+FROM customer_master c JOIN account_master a ON
+c.customer_number=a.customer_number
+ORDER BY a.account_number;
+
+
+2. Query to display the number of customer’s from Delhi with an alias name of Cust_Count.
+SELECT count(customer_number) Cust_Count FROM customer_master WHERE customer_city='Delhi';
+
+
+3. Query to display the customer number, customer firstname, account number for the customer’s whose accounts were created after 15th of any month. Records sorted in
+ascending order based on customer number and then by account number.
+SELECT c.customer_number,c.firstname,a.account_number FROM account_master a join
+customer_master c ON c.customer_number=a.customer_number WHERE
+day(a.account_opening_date)>'15' ORDER BY c.customer_number,a.account_number;
+
+
+4.Query to display customer number, customer's first name, account number where the account status is terminated. Records sorted in ascending order based on customer
+number and then by account number.
+SELECT c.customer_number,c.firstname,a.account_number
+FROMaccount_master a JOIN customer_master c
+ON c.customer_number=a.customer_number
+WHERE a.account_status='Terminated'
+ORDER BY c.customer_number,a.account_number;
+
+
+5. Query to display the total number of withdrawals and total number of deposits being done by customer whose customer number ends with 001. Query displaing transaction type 
+and the number of transactions.Records sorted in ascending order based on transaction type.
+SELECT transaction_type,count(transaction_number) Trans_Count
+FROM account_master am JOIN transaction_details td
+ON am.account_number=td.account_number
+WHERE customer_number like '%001'
+GROUP BY transaction_type
+ORDER BY transaction_type
+
+
+6. Query to display the number of customers who have registration but no account in the bank. 
+SELECT count(customer_number) Count_Customer FROM customer_master
+WHERE customer_number NOT IN (SELECT customer_number FROM account_master);
+
+
+7. Query to display account number and total amount deposited by each account holder (Including the opening balance).Records sorted order based on account number.
+SELECT a.account_number,a.opening_balance+sum(t.transaction_amount)
+FROM account_master a JOIN transaction_details t ON a.account_number=t.account_number
+WHERE t.transaction_type='Deposit' GROUP BY t.account_number;
+
+
+8. Query to display the number of accounts opened in each city .Query displaing Branch City and number of accounts as No_of_Accounts.
+For the branch city where we don’t have any accounts opened displaing 0 , records sorted order based on branch city.
+SELECT branch.branch_city, count(account.account_number) No_of_Accounts
+FROM branch_master LEFT JOIN account_master
+ON account.branch_id=branch.branch_id
+GROUP BY branch.branch_city ORDER BY branch_city;
+
+
+9. Query to display the firstname of the customers who have more than 1 account, records sorted order based on firstname.
+SELECT c.firstname FROM
+customer_master c JOIN account_master a ON a.customer_number=c.customer_number
+GROUP BY a.customer_number HAVING count(a.account_number)>1;
+
+
+10. Query to display the customer number, customer firstname, customer lastname who has taken loan from more than 1 branch ,records sorted order based on customer number.
+SELECT c.customer_number,c.firstname,c.lastname FROM
+customer_master c JOIN loan_details l ON c.customer_number=l.customer_number
+GROUP BY l.customer_number HAVING count(l.branch_id)>1
+ORDER BY c.customer_number;
+
+
+11.Query to display the customer’s number, customer’s firstname, customer’s city and branch city ,where the city of the customer and city of the branch is different.
+Records sorted in ascending order based on customer number.
+SELECT c.customer_number,c.firstname,c.customer_city,b.branch_city FROM
+Customer_master c JOIN Account_master a ON c.customer_number=a.customer_number
+JOIN Branch_master b ON b.branch_id=a.branch_id
+WHERE b.branch_city<>c.customer_city
+ORDER BY c.customer_number;
+
+
+12. Query to display the number of clients who have asked for loans but they don’t have any account in the bank though they are registered customers. 
+SELECT count(c.customer_number)Count FROM customer_master c JOIN loan_details l
+ON c.customer_number=l.customer_number
+WHERE c.customer_number NOT IN (SELECT customer_number FROM account_master);
+
+
+13. Query to display the account number who has done the highest transaction. For example the account A00023 has done 5 transactions i.e. suppose 3 withdrawal and 2 deposits.
+Whereas the account A00024 has done 3 transactions i.e. suppose 2 withdrawals and 1 deposit. So account number of A00023 should be displayed. 
+In case of multiple records, records are sorted in ascending order based on account number.
+SELECT account_number FROM transaction_details
+GROUP BY account_number
+HAVING count(transaction_number)>=ALL
+(SELECT count(transaction_number) FROM transaction_details
+GROUP BY account_number) ORDER BY account_number;
+
+
+14. Query to show the branch name,branch city where we have the maximum customers. For example the branch B00019 has 3 customers, B00020 has 7 and B00021 has 10. 
+So branch id B00021 is having maximum customers. In case of multiple records, records are sorted in ascending order based on branch name.
+SELECT b.branch_name,b.branch_city FROM
+Branch_master b JOIN account a ON a.branch_id=b.branch_id
+GROUP BY a.branch_id HAVING count(a.customer_number)>=ALL
+(SELECT count(customer_number) FROM
+Account_master GROUP BY branch_id)
+ORDER BY b.branch_name;
+
+
+15. Query to display all those account number, deposit, withdrawal where withdrawal is more than deposit amount. Deposit includes opening balance as well.
+For example A00011 account opened with Opening Balance 1000 and A00011 deposited 2000 rupees on 2012-12-01 and 3000 rupees on 2012-12-02. The same account i.e A00011 
+withdrawn 3000 rupees on 2013-01-01 and 7000 rupees on 2013-01-03. So the total deposited amount is 6000 and total withdrawal amount is 10000. So withdrawal amount is 
+more than deposited amount for account number A00011. Records are sorted in ascending order based on account number.
+SELECT td.account_number,
+sum(CASE WHEN transaction_type='Deposit' THEN transaction_amount END)
++(SELECT opening_balance
+FROM account_master where account_number=td.account_number) Deposit,
+sum(CASE WHEN transaction_type='Withdrawal' THEN transaction_amount END) Withdrawal
+FROM transaction_details td
+GROUP BY td.account_number
+HAVING Withdrawal > Deposit
+ORDER BY td.account_number;
+
+
+16. Query to show the balance amount for account number that ends with 001. Note: Balance amount includes account opening balance also. For example A00015 is having an 
+opening balance of 1000. A00015 has deposited 2000 on 2012-06-12 and deposited 3000 on 2012-07-13. The same account has drawn money of 500 on 2012-08-12 , 500 on
+2012-09-15, 1000 on 2012-12-17. So balance amount is 4000 i.e (1000 (opening balance)+2000+3000 ) – (500+500+1000).
+SELECT ifnull((SUM(CASE WHEN transaction_type='Deposit'
+THEN transaction_amount END)) -
+(SUM(CASE WHEN transaction_type='Withdrawal'
+THEN transaction_amount END))+(select opening_balance
+from account_master where account_number like '%001'),(SUM(CASE WHEN
+transaction_type='Deposit'
+THEN transaction_amount END))+(select opening_balance
+from account_master where account_number like '%001')) AS Balance_Amount
+FROM transaction_details where account_number like '%001';
+
+
+
+17. Query to display the customer’s firstname who have multiple accounts (atleast 2 accounts). Records sorted in ascending order based on customer's firstname.
+SELECT c.firstname FROM
+Customer_master c JOIN account_master a ON c.customer_number=a.customer_number
+GROUP BY a.customer_number HAVING count(a.account_number)>1
+ORDER BY c.firstname;
+
+
+18. Query to display the customer number, firstname, lastname for those client where total loan amount taken is maximum and at least taken from 2 branches.
+For example the customer C00012 took a loan of 100000 from bank branch with id B00009 and C00012 Took a loan of 500000 from bank branch with id B00010.
+So total loan amount for customer C00012 is 600000. C00013 took a loan of 100000 from bank branch B00009 and 200000 from bank branch B00011. So total loan taken is 300000. 
+So loan taken by C00012 is more then C00013.
+SELECT ld.customer_number, firstname, lastname
+FROM customer_master cm JOIN loan_details ld
+ON cm.customer_number=ld.customer_number
+GROUP BY customer_number
+HAVING count(branch_id)>=2 AND sum(loan_amount)>= ALL(SELECT sum(loan_amount) FROM loan GROUP BY customer_number);
+
+
+19. Query to display the customer’s number, customer’s firstname, branch id and loan amount for people who have taken loans. 
+Records are sorted in ascending order based on customer number and then by branch id and then by loan amount.
+SELECT c.customer_number,c.firstname,l.branch_id,l.loan_amount FROM
+Customer_master c JOIN loan_details l ON c.customer_number=l.customer_number
+ORDER BY c.customer_number,l.branch_id,l.loan_amount;
+
+
+20. Query to display the customers firstname, city and account number whose occupation are not into Business, Service or Student. 
+Records are sorted in ascending order based on customer first name and then by account number.
+SELECT c.firstname,c.customer_city,a.account_number FROM
+Customer_master c JOIN account_master a ON a.customer_number=c.customer_number
+WHERE c.occupation NOT IN ('Service','Student','Business')
+ORDER BY c.firstname,a.account_number;
+
+
+
+
+
+
+
+
+
